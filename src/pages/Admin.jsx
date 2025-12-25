@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DataService } from '../services/DataService';
 import { useAuth } from '../context/AuthContext';
-import { User, Image, Monitor, MessageSquare, Save, Trash2, Plus } from 'lucide-react';
+import { User, Image, Monitor, MessageSquare, Save, Trash2, Plus, LayoutDashboard } from 'lucide-react';
 
 export default function Admin() {
     const { logout } = useAuth();
