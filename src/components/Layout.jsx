@@ -2,17 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import FloatingSocials from './FloatingSocials';
+import AdvancedAd from './AdvancedAd';
 import { DataService } from '../services/DataService';
 
 export default function Layout() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [title, setTitle] = useState("Ravindra Khillare");
+    const [activeAd, setActiveAd] = useState(null);
+    const [showAd, setShowAd] = useState(false);
 
     useEffect(() => {
         const loadConfig = async () => {
             const data = await DataService.get();
             if (data.config?.websiteTitle) {
                 setTitle(data.config.websiteTitle);
+            }
+            // Load Ads logic
+            if (data.ads) {
+                const bannerOrInterstitial = data.ads.find(a => a.active && (a.type === 'banner' || a.type === 'interstitial'));
+                if (bannerOrInterstitial) {
+                    setActiveAd(bannerOrInterstitial);
+                    setShowAd(true);
+                }
             }
         };
         loadConfig();
@@ -58,6 +69,14 @@ export default function Layout() {
                 <Outlet />
             </main>
             <FloatingSocials />
+            {/* Global Ad Layer */}
+            {activeAd && showAd && (
+                <AdvancedAd
+                    ad={activeAd}
+                    format={activeAd.type}
+                    onClose={() => setShowAd(false)}
+                />
+            )}
             <footer className="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
                 <div className="max-w-7xl mx-auto px-4 text-center">
                     <p>© {new Date().getFullYear()} {title}. All rights reserved.</p>

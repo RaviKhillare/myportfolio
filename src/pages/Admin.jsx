@@ -669,6 +669,22 @@ export default function Admin() {
                                                     <option value="false">Inactive</option>
                                                 </select>
                                             </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-500 uppercase">Type</label>
+                                                <select
+                                                    className="w-full border p-2 rounded mt-1 uppercase"
+                                                    value={ad.type || 'banner'}
+                                                    onChange={(e) => {
+                                                        const newAds = [...data.ads];
+                                                        newAds[idx].type = e.target.value;
+                                                        setData({ ...data, ads: newAds });
+                                                    }}
+                                                >
+                                                    <option value="banner">Banner (Sticky)</option>
+                                                    <option value="interstitial">Interstitial (Popup)</option>
+                                                    <option value="native">Native (Inline)</option>
+                                                </select>
+                                            </div>
                                             <div className="md:col-span-2">
                                                 <label className="text-xs font-bold text-slate-500 uppercase">Content</label>
                                                 <input
