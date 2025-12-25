@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { DataService } from '../services/DataService';
 
 const AuthContext = createContext(null);
 
@@ -14,9 +15,9 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const login = (password) => {
-        // Simple hardcoded password for now - acceptable for simple client-side portfolio
-        if (password === 'admin123') {
+    const login = async (password) => {
+        const isValid = await DataService.checkPassword(password);
+        if (isValid) {
             localStorage.setItem('portfolio_auth', 'true');
             setIsAuthenticated(true);
             return true;

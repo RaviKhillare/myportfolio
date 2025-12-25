@@ -23,9 +23,22 @@ const initialData = {
         { id: 4, title: "Digital Education", description: "Creating engaging online games, videos, and ebooks for kids.", icon: "BookOpen" }
     ],
     slider: [
-        { id: 1, text: "Empowering Students with Digital Skills", active: true },
-        { id: 2, text: "Innovative Solutions for Modern Education", active: true },
-        { id: 3, text: "Building the Future with Robotics & Code", active: true }
+        {
+            id: 1,
+            title: "Digital Skills",
+            text: "Empowering Students with Digital Skills for the Future.",
+            image: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=800&q=80",
+            link: "#",
+            active: true
+        },
+        {
+            id: 2,
+            title: "Robotics",
+            text: "Building the Future with Hands-on Robotics & Code.",
+            image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&q=80",
+            link: "#",
+            active: true
+        }
     ],
     ads: [
         {
@@ -37,7 +50,10 @@ const initialData = {
             active: true
         }
     ],
-    messages: []
+    messages: [],
+    settings: {
+        password: "admin123" // Default password, changeable in Admin
+    }
 };
 
 // Internal helper for LocalStorage
@@ -111,5 +127,16 @@ export const DataService = {
             }
         }
         return newMsg;
+    },
+
+    checkPassword: async (inputPassword) => {
+        const data = await DataService.get();
+        // Fallback if settings doesn't exist yet (old data)
+        const stored = data.settings?.password || "admin123";
+        return inputPassword === stored;
+    },
+
+    changeSettings: async (newSettings) => {
+        return await DataService.update('settings', newSettings);
     }
 };

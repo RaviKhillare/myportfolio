@@ -13,9 +13,9 @@ export default function Login() {
         if (isAuthenticated) navigate('/admin');
     }, [isAuthenticated, navigate]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (login(password)) {
+        if (await login(password)) {
             navigate('/admin');
         } else {
             setError('Invalid password');
@@ -53,10 +53,6 @@ export default function Login() {
                         Unlock Dashboard
                     </button>
                 </form>
-
-                <div className="mt-6 text-center text-xs text-slate-400">
-                    Default Password: admin123
-                </div>
             </div>
         </div>
     );

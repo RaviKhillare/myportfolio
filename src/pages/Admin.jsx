@@ -37,6 +37,7 @@ export default function Admin() {
         { id: 'slider', label: 'Slider', icon: Image },
         { id: 'ads', label: 'Ads', icon: Monitor },
         { id: 'messages', label: 'Messages', icon: MessageSquare },
+        { id: 'settings', label: 'Security', icon: User } // Re-using User icon or could import Lock
     ];
 
     return (
@@ -122,11 +123,11 @@ export default function Admin() {
                     {activeTab === 'slider' && (
                         <div>
                             <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-xl font-bold">Manage Slider Text</h2>
+                                <h2 className="text-xl font-bold">Manage Slider</h2>
                                 <button
                                     onClick={() => {
-                                        const newItem = { id: Date.now(), text: "New Slide Text", active: true };
-                                        const newSlider = [...data.slider, newItem];
+                                        const newItem = { id: Date.now(), title: "Title", text: "Description", image: "", link: "#", active: true };
+                                        const newSlider = [...data.slider];
                                         handleSave('slider', newSlider);
                                     }}
                                     className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
@@ -134,44 +135,92 @@ export default function Admin() {
                                     <Plus size={16} /> Add Slide
                                 </button>
                             </div>
-                            <div className="space-y-4">
+                            <div className="space-y-6">
                                 {data.slider.map((slide, idx) => (
-                                    <div key={slide.id} className="flex gap-4 items-center bg-slate-50 p-4 rounded-lg border">
-                                        <input
-                                            className="flex-1 border p-2 rounded"
-                                            value={slide.text}
-                                            onChange={(e) => {
-                                                const newSlider = [...data.slider];
-                                                newSlider[idx].text = e.target.value;
-                                                setData({ ...data, slider: newSlider });
-                                            }}
-                                        />
-                                        <button
-                                            onClick={() => {
-                                                const newSlider = [...data.slider];
-                                                newSlider[idx].active = !newSlider[idx].active;
-                                                handleSave('slider', newSlider);
-                                            }}
-                                            className={`px-3 py-1 rounded text-sm ${slide.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}
-                                        >
-                                            {slide.active ? 'Active' : 'Hidden'}
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                const newSlider = data.slider.filter(s => s.id !== slide.id);
-                                                handleSave('slider', newSlider);
-                                            }}
-                                            className="text-red-500 hover:bg-red-50 p-2 rounded"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
+                                    <div key={slide.id} className="bg-slate-50 p-6 rounded-xl border space-y-4">
+                                        <div className="flex justify-between">
+                                            <h3 className="font-semibold text-slate-700">Slide #{idx + 1}</h3>
+                                            <button
+                                                onClick={() => {
+                                                    const newSlider = data.slider.filter(s => s.id !== slide.id);
+                                                    handleSave('slider', newSlider);
+                                                }}
+                                                className="text-red-500 hover:text-red-700"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="md:col-span-2">
+                                                <label className="text-xs font-bold text-slate-500 uppercase">Title</label>
+                                                <input
+                                                    className="w-full border p-2 rounded mt-1"
+                                                    value={slide.title || ''}
+                                                    onChange={(e) => {
+                                                        const newSlider = [...data.slider];
+                                                        newSlider[idx].title = e.target.value;
+                                                        setData({ ...data, slider: newSlider });
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <label className="text-xs font-bold text-slate-500 uppercase">Description</label>
+                                                <textarea
+                                                    className="w-full border p-2 rounded mt-1 h-20"
+                                                    value={slide.text}
+                                                    onChange={(e) => {
+                                                        const newSlider = [...data.slider];
+                                                        newSlider[idx].text = e.target.value;
+                                                        setData({ ...data, slider: newSlider });
+                                                    }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-500 uppercase">Image URL</label>
+                                                <input
+                                                    className="w-full border p-2 rounded mt-1"
+                                                    value={slide.image || ''}
+                                                    placeholder="https://..."
+                                                    onChange={(e) => {
+                                                        const newSlider = [...data.slider];
+                                                        newSlider[idx].image = e.target.value;
+                                                        setData({ ...data, slider: newSlider });
+                                                    }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-500 uppercase">Link URL</label>
+                                                <input
+                                                    className="w-full border p-2 rounded mt-1"
+                                                    value={slide.link || ''}
+                                                    placeholder="#"
+                                                    onChange={(e) => {
+                                                        const newSlider = [...data.slider];
+                                                        newSlider[idx].link = e.target.value;
+                                                        setData({ ...data, slider: newSlider });
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <button
+                                                onClick={() => {
+                                                    const newSlider = [...data.slider];
+                                                    newSlider[idx].active = !newSlider[idx].active;
+                                                    handleSave('slider', newSlider);
+                                                }}
+                                                className={`px-3 py-1 rounded text-sm ${slide.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}
+                                            >
+                                                {slide.active ? 'Active' : 'Hidden'}
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                                 <button
                                     onClick={() => handleSave('slider', data.slider)}
                                     className="mt-4 bg-primary text-white px-6 py-2 rounded-lg flex items-center gap-2"
                                 >
-                                    <Save size={18} /> Save All
+                                    <Save size={18} /> Update Slider
                                 </button>
                             </div>
                         </div>
@@ -313,6 +362,37 @@ export default function Admin() {
                                     ))}
                                 </div>
                             )}
+                        </div>
+                    )}
+
+                    {activeTab === 'settings' && (
+                        <div className="max-w-md">
+                            <h2 className="text-xl font-bold mb-6">Security Settings</h2>
+                            <div className="bg-slate-50 p-6 rounded-xl border">
+                                <label className="block text-sm font-medium mb-1">New Password</label>
+                                <input
+                                    type="password"
+                                    className="w-full border p-2 rounded mb-4"
+                                    placeholder="Enter new password"
+                                    id="new-password"
+                                />
+                                <button
+                                    onClick={() => {
+                                        const newPass = document.getElementById('new-password').value;
+                                        if (newPass) {
+                                            handleSave('settings', { ...data.settings, password: newPass });
+                                        }
+                                    }}
+                                    className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700"
+                                >
+                                    Update Password
+                                </button>
+                            </div>
+                            <div className="mt-8">
+                                <h3 className="font-bold mb-2">Build Information</h3>
+                                <p className="text-sm text-slate-500">Version: 2.0.0 (Production Ready)</p>
+                                <p className="text-sm text-slate-500">Backend: Hybrid (Firebase / LocalStorage)</p>
+                            </div>
                         </div>
                     )}
                 </div>
