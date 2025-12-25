@@ -46,6 +46,21 @@ const initialData = {
         { id: 3, title: "Robotics", description: "Designing autonomous systems.", icon: "Bot" },
         { id: 4, title: "Digital Education", description: "Creating engaging content.", icon: "BookOpen" }
     ],
+    projects: [
+        {
+            id: 1,
+            title: "Smart Home Automation",
+            description: "A complete IoT solution for modern homes using Arduino and React.",
+            thumbnail: "https://images.unsplash.com/photo-1558002038-1091556a92a3?w=800&q=80",
+            tags: ["IoT", "React", "Arduino"],
+            blocks: [
+                { id: 101, type: "text", content: "This project aims to automate daily tasks using smart sensors." },
+                { id: 102, type: "image", content: "https://images.unsplash.com/photo-1558002038-1091556a92a3?w=800&q=80" },
+                { id: 103, type: "text", content: "We used ESP8266 modules for wireless connectivity." },
+                { id: 104, type: "link", content: "https://github.com/example/project", label: "View Source Code" }
+            ]
+        }
+    ],
     ads: [
         {
             id: 1,

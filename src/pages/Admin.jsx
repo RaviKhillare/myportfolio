@@ -34,6 +34,7 @@ export default function Admin() {
 
     const tabs = [
         { id: 'profile', label: 'Profile', icon: User },
+        { id: 'projects', label: 'Projects', icon: LayoutDashboard }, // New Projects Tab
         { id: 'config', label: 'General', icon: Monitor }, // Changed Monitor to something else properly if needed, but Monitor is fine for now
         { id: 'services', label: 'Services', icon: Image }, // Re-using icons for now
         { id: 'slider', label: 'Slider', icon: Image },
@@ -307,6 +308,193 @@ export default function Admin() {
                             >
                                 <Save size={18} /> Save Changes
                             </button>
+                        </div>
+                    )}
+
+                    {activeTab === 'projects' && (
+                        <div>
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-bold">Manage Projects</h2>
+                                <button
+                                    onClick={() => {
+                                        const newProject = {
+                                            id: Date.now(),
+                                            title: "New Project",
+                                            description: "Project Description",
+                                            thumbnail: "",
+                                            tags: [],
+                                            blocks: []
+                                        };
+                                        const newProjects = [...(data.projects || []), newProject];
+                                        handleSave('projects', newProjects);
+                                    }}
+                                    className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+                                >
+                                    <Plus size={16} /> Create Project
+                                </button>
+                            </div>
+
+                            <div className="space-y-8">
+                                {data.projects?.map((project, idx) => (
+                                    <div key={project.id} className="bg-slate-50 p-6 rounded-xl border space-y-4">
+                                        {/* Project Header */}
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex-1 space-y-2">
+                                                <label className="text-xs font-bold text-slate-500 uppercase">Project Title</label>
+                                                <input
+                                                    className="w-full border p-2 rounded bg-white text-lg font-bold"
+                                                    value={project.title}
+                                                    onChange={(e) => {
+                                                        const newProjects = [...data.projects];
+                                                        newProjects[idx].title = e.target.value;
+                                                        setData({ ...data, projects: newProjects });
+                                                    }}
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm('Delete project?')) {
+                                                        const newProjects = data.projects.filter(p => p.id !== project.id);
+                                                        handleSave('projects', newProjects);
+                                                    }
+                                                }}
+                                                className="ml-4 text-red-500 hover:text-red-700 bg-red-50 p-2 rounded"
+                                            >
+                                                <Trash2 size={20} />
+                                            </button>
+                                        </div>
+
+                                        {/* Metadata */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-500 uppercase">Short Description</label>
+                                                <textarea
+                                                    className="w-full border p-2 rounded mt-1 bg-white h-20"
+                                                    value={project.description}
+                                                    onChange={(e) => {
+                                                        const newProjects = [...data.projects];
+                                                        newProjects[idx].description = e.target.value;
+                                                        setData({ ...data, projects: newProjects });
+                                                    }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-500 uppercase">Thumbnail URL</label>
+                                                <input
+                                                    className="w-full border p-2 rounded mt-1 bg-white"
+                                                    value={project.thumbnail}
+                                                    placeholder="https://..."
+                                                    onChange={(e) => {
+                                                        const newProjects = [...data.projects];
+                                                        newProjects[idx].thumbnail = e.target.value;
+                                                        setData({ ...data, projects: newProjects });
+                                                    }}
+                                                />
+                                                <label className="text-xs font-bold text-slate-500 uppercase mt-2 block">Tags (comma separated)</label>
+                                                <input
+                                                    className="w-full border p-2 rounded mt-1 bg-white"
+                                                    value={project.tags?.join(', ') || ''}
+                                                    placeholder="React, IoT, Design"
+                                                    onChange={(e) => {
+                                                        const newProjects = [...data.projects];
+                                                        newProjects[idx].tags = e.target.value.split(',').map(t => t.trim());
+                                                        setData({ ...data, projects: newProjects });
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Block Editor */}
+                                        <div className="bg-white p-4 rounded-lg border border-slate-200">
+                                            <h4 className="font-semibold text-slate-700 mb-4">Content Blocks</h4>
+                                            <div className="space-y-4 mb-4">
+                                                {project.blocks?.map((block, bIdx) => (
+                                                    <div key={block.id} className="flex gap-4 items-start p-3 bg-slate-50 rounded border group">
+                                                        <span className="text-xs font-bold uppercase text-slate-400 mt-2 w-12">{block.type}</span>
+                                                        <div className="flex-1 space-y-2">
+                                                            {block.type !== 'link' && (
+                                                                <textarea
+                                                                    className="w-full border p-2 rounded text-sm min-h-[60px]"
+                                                                    value={block.content}
+                                                                    placeholder={block.type === 'image' ? 'Image URL' : 'Content...'}
+                                                                    onChange={(e) => {
+                                                                        const newProjects = [...data.projects];
+                                                                        newProjects[idx].blocks[bIdx].content = e.target.value;
+                                                                        setData({ ...data, projects: newProjects });
+                                                                    }}
+                                                                />
+                                                            )}
+                                                            {block.type === 'link' && (
+                                                                <>
+                                                                    <input
+                                                                        className="w-full border p-2 rounded text-sm"
+                                                                        value={block.label}
+                                                                        placeholder="Link Label (e.g. View Code)"
+                                                                        onChange={(e) => {
+                                                                            const newProjects = [...data.projects];
+                                                                            newProjects[idx].blocks[bIdx].label = e.target.value;
+                                                                            setData({ ...data, projects: newProjects });
+                                                                        }}
+                                                                    />
+                                                                    <input
+                                                                        className="w-full border p-2 rounded text-sm"
+                                                                        value={block.content}
+                                                                        placeholder="https://..."
+                                                                        onChange={(e) => {
+                                                                            const newProjects = [...data.projects];
+                                                                            newProjects[idx].blocks[bIdx].content = e.target.value;
+                                                                            setData({ ...data, projects: newProjects });
+                                                                        }}
+                                                                    />
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                        <button
+                                                            onClick={() => {
+                                                                const newProjects = [...data.projects];
+                                                                newProjects[idx].blocks = newProjects[idx].blocks.filter(b => b.id !== block.id);
+                                                                setData({ ...data, projects: newProjects });
+                                                            }}
+                                                            className="text-slate-400 hover:text-red-500"
+                                                        >
+                                                            <X size={16} />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Add Block Controls */}
+                                            <div className="flex gap-2 text-sm">
+                                                <span className="text-slate-500 py-1">Add Block:</span>
+                                                {['text', 'image', 'video', 'link'].map(type => (
+                                                    <button
+                                                        key={type}
+                                                        onClick={() => {
+                                                            const newBlock = { id: Date.now(), type, content: "", label: "" };
+                                                            const newProjects = [...data.projects];
+                                                            if (!newProjects[idx].blocks) newProjects[idx].blocks = [];
+                                                            newProjects[idx].blocks.push(newBlock);
+                                                            setData({ ...data, projects: newProjects });
+                                                        }}
+                                                        className="px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded capitalize text-slate-700"
+                                                    >
+                                                        + {type}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-end">
+                                            <button
+                                                onClick={() => handleSave('projects', data.projects)}
+                                                className="bg-primary text-white px-6 py-2 rounded-lg flex items-center gap-2"
+                                            >
+                                                <Save size={18} /> Save Project
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
 
