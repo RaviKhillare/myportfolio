@@ -1,5 +1,9 @@
+import { db } from '../firebase';
+import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
+
 const DB_KEY = 'portfolio_db_v1';
 
+// Initial Data same as before...
 const initialData = {
     profile: {
         name: "Ravindra Khillare",
@@ -36,30 +40,76 @@ const initialData = {
     messages: []
 };
 
-// Initialize DB if not exists
-if (!localStorage.getItem(DB_KEY)) {
-    localStorage.setItem(DB_KEY, JSON.stringify(initialData));
-}
+// Internal helper for LocalStorage
+const getLocal = () => {
+    const s = localStorage.getItem(DB_KEY);
+    return s ? JSON.parse(s) : initialData;
+};
+const setLocal = (data) => localStorage.setItem(DB_KEY, JSON.stringify(data));
+
+// Ensure local storage is seeded
+if (!localStorage.getItem(DB_KEY)) setLocal(initialData);
 
 export const DataService = {
-    get: () => {
-        return JSON.parse(localStorage.getItem(DB_KEY));
+    get: async () => {
+        if (db) {
+            try {
+                const docRef = doc(db, "portfolio", "main");
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    return docSnap.data();
+                } else {
+                    // Seed Firestore if empty
+                    await setDoc(docRef, initialData);
+                    return initialData;
+                }
+            } catch (e) {
+                console.error("Error fetching from Firebase", e);
+                return getLocal();
+            }
+        } else {
+            return getLocal();
+        }
     },
-    update: (section, data) => {
-        const db = JSON.parse(localStorage.getItem(DB_KEY));
-        db[section] = data;
-        localStorage.setItem(DB_KEY, JSON.stringify(db));
-        return db;
+
+    // Because this is a simple portfolio, we can just save the whole section or object
+    // A cleaner approach for production is sub-collections, but one document is fine for small data
+    update: async (section, data) => {
+        // Optimistic update for UI speed
+        const currentLocal = getLocal();
+        currentLocal[section] = data;
+        setLocal(currentLocal);
+
+        if (db) {
+            try {
+                const docRef = doc(db, "portfolio", "main");
+                await updateDoc(docRef, { [section]: data });
+            } catch (e) {
+                console.error("Error updating Firebase", e);
+            }
+        }
+        return currentLocal;
     },
-    // Specific helper for messages since it's append-only usually
-    addMessage: (msg) => {
-        const db = JSON.parse(localStorage.getItem(DB_KEY));
+
+    addMessage: async (msg) => {
         const newMsg = { id: Date.now(), ...msg, date: new Date().toISOString() };
-        db.messages.push(newMsg);
-        localStorage.setItem(DB_KEY, JSON.stringify(db));
+
+        // Local update
+        const currentLocal = getLocal();
+        currentLocal.messages.push(newMsg);
+        setLocal(currentLocal);
+
+        if (db) {
+            try {
+                const docRef = doc(db, "portfolio", "main");
+                // Use arrayUnion to append atomically
+                await updateDoc(docRef, {
+                    messages: arrayUnion(newMsg)
+                });
+            } catch (e) {
+                console.error("Error sending message to Firebase", e);
+            }
+        }
         return newMsg;
-    },
-    reset: () => {
-        localStorage.setItem(DB_KEY, JSON.stringify(initialData));
     }
 };

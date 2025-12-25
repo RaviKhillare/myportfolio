@@ -10,15 +10,21 @@ export default function Admin() {
     const [toast, setToast] = useState('');
 
     useEffect(() => {
-        setData(DataService.get());
+        const loadData = async () => {
+            const result = await DataService.get();
+            setData(result);
+        };
+        loadData();
     }, []);
 
-    const handleSave = (section, newData) => {
-        const updated = DataService.update(section, newData);
-        setData(updated);
+    const handleSave = async (section, newData) => {
+        // Optimistically update UI
+        setData(prev => ({ ...prev, [section]: newData }));
+
+        // Persist
+        await DataService.update(section, newData);
         showToast('Saved successfully!');
     };
-
     const showToast = (msg) => {
         setToast(msg);
         setTimeout(() => setToast(''), 3000);

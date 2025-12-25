@@ -18,8 +18,9 @@ export default function Home() {
 
     useEffect(() => {
         // Basic polling to fetch updates from local storage/db
-        const fetchData = () => {
-            setData(DataService.get());
+        const fetchData = async () => {
+            const result = await DataService.get();
+            setData(result);
         };
         fetchData();
         window.addEventListener('storage', fetchData); // Listen for cross-tab updates

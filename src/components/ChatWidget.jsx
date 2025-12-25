@@ -7,11 +7,11 @@ export default function ChatWidget() {
     const [message, setMessage] = useState('');
     const [sent, setSent] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!message.trim()) return;
 
-        DataService.addMessage({
+        await DataService.addMessage({
             text: message,
             sender: 'Guest User'
         });
