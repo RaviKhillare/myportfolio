@@ -40,17 +40,35 @@ const initialData = {
             active: true
         }
     ],
+    services: [
+        { id: 1, title: "Software Development", description: "Building robust applications.", icon: "Code" },
+        { id: 2, title: "Hardware Solutions", description: "Expertise in hardware integration.", icon: "Cpu" },
+        { id: 3, title: "Robotics", description: "Designing autonomous systems.", icon: "Bot" },
+        { id: 4, title: "Digital Education", description: "Creating engaging content.", icon: "BookOpen" }
+    ],
     ads: [
         {
             id: 1,
             title: "Local Book Store",
             content: "Get 20% off on all coding books!",
+            type: "banner", // banner, interstitial, native
             startDate: "2024-01-01",
             endDate: "2025-12-31",
             active: true
         }
     ],
     messages: [],
+    config: {
+        websiteTitle: "Ravindra Khillare",
+        logoUrl: "", // Optional
+        email: "contact@example.com",
+        phone: "+91 1234567890",
+        socialLinks: [
+            { id: 1, platform: "linkedin", url: "https://linkedin.com", icon: "Linkedin" },
+            { id: 2, platform: "twitter", url: "https://twitter.com", icon: "Twitter" },
+            { id: 3, platform: "instagram", url: "https://instagram.com", icon: "Instagram" }
+        ]
+    },
     settings: {
         password: "admin123" // Default password, changeable in Admin
     }

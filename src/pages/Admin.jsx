@@ -34,10 +34,12 @@ export default function Admin() {
 
     const tabs = [
         { id: 'profile', label: 'Profile', icon: User },
+        { id: 'config', label: 'General', icon: Monitor }, // Changed Monitor to something else properly if needed, but Monitor is fine for now
+        { id: 'services', label: 'Services', icon: Image }, // Re-using icons for now
         { id: 'slider', label: 'Slider', icon: Image },
         { id: 'ads', label: 'Ads', icon: Monitor },
         { id: 'messages', label: 'Messages', icon: MessageSquare },
-        { id: 'settings', label: 'Security', icon: User } // Re-using User icon or could import Lock
+        { id: 'settings', label: 'Security', icon: User }
     ];
 
     return (
@@ -73,6 +75,194 @@ export default function Admin() {
                     {toast && (
                         <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-in slide-in-from-right fade-in z-50">
                             {toast}
+                        </div>
+                    )}
+
+                    {activeTab === 'config' && (
+                        <div className="space-y-8">
+                            <h2 className="text-xl font-bold">General Settings</h2>
+
+                            {/* Website Identity */}
+                            <div className="bg-slate-50 p-6 rounded-xl border space-y-4">
+                                <h3 className="font-semibold text-slate-700">Identity</h3>
+                                <div>
+                                    <label className="text-xs font-bold text-slate-500 uppercase">Website Title</label>
+                                    <input
+                                        className="w-full border p-2 rounded mt-1"
+                                        value={data.config?.websiteTitle || ''}
+                                        onChange={(e) => setData({ ...data, config: { ...data.config, websiteTitle: e.target.value } })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-slate-500 uppercase">Logo URL (Optional)</label>
+                                    <input
+                                        className="w-full border p-2 rounded mt-1"
+                                        placeholder="https://..."
+                                        value={data.config?.logoUrl || ''}
+                                        onChange={(e) => setData({ ...data, config: { ...data.config, logoUrl: e.target.value } })}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Contact Info */}
+                            <div className="bg-slate-50 p-6 rounded-xl border space-y-4">
+                                <h3 className="font-semibold text-slate-700">Contact Details</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-bold text-slate-500 uppercase">Email</label>
+                                        <input
+                                            className="w-full border p-2 rounded mt-1"
+                                            value={data.config?.email || ''}
+                                            onChange={(e) => setData({ ...data, config: { ...data.config, email: e.target.value } })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold text-slate-500 uppercase">Phone</label>
+                                        <input
+                                            className="w-full border p-2 rounded mt-1"
+                                            value={data.config?.phone || ''}
+                                            onChange={(e) => setData({ ...data, config: { ...data.config, phone: e.target.value } })}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Social Media */}
+                            <div className="bg-slate-50 p-6 rounded-xl border space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="font-semibold text-slate-700">Social Media Links</h3>
+                                    <button
+                                        onClick={() => {
+                                            const newLink = { id: Date.now(), platform: "Platform", url: "https://", icon: "Link" };
+                                            const newLinks = [...(data.config?.socialLinks || []), newLink];
+                                            setData({ ...data, config: { ...data.config, socialLinks: newLinks } });
+                                        }}
+                                        className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200"
+                                    >
+                                        + Add Link
+                                    </button>
+                                </div>
+                                <div className="space-y-3">
+                                    {data.config?.socialLinks?.map((link, idx) => (
+                                        <div key={link.id} className="flex gap-2 items-center">
+                                            <input
+                                                className="w-1/3 border p-2 rounded"
+                                                placeholder="Platform Name"
+                                                value={link.platform}
+                                                onChange={(e) => {
+                                                    const newLinks = [...data.config.socialLinks];
+                                                    newLinks[idx].platform = e.target.value;
+                                                    setData({ ...data, config: { ...data.config, socialLinks: newLinks } });
+                                                }}
+                                            />
+                                            <input
+                                                className="flex-1 border p-2 rounded"
+                                                placeholder="URL"
+                                                value={link.url}
+                                                onChange={(e) => {
+                                                    const newLinks = [...data.config.socialLinks];
+                                                    newLinks[idx].url = e.target.value;
+                                                    setData({ ...data, config: { ...data.config, socialLinks: newLinks } });
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    const newLinks = data.config.socialLinks.filter(l => l.id !== link.id);
+                                                    setData({ ...data, config: { ...data.config, socialLinks: newLinks } });
+                                                }}
+                                                className="text-red-500 hover:bg-red-50 p-2 rounded"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => handleSave('config', data.config)}
+                                className="bg-primary text-white px-6 py-2 rounded-lg flex items-center gap-2"
+                            >
+                                <Save size={18} /> Save Settings
+                            </button>
+                        </div>
+                    )}
+
+                    {activeTab === 'services' && (
+                        <div>
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-bold">Manage Services</h2>
+                                <button
+                                    onClick={() => {
+                                        const newItem = { id: Date.now(), title: "New Service", description: "Service Description", icon: "Box" };
+                                        const newItems = [...(data.services || []), newItem];
+                                        handleSave('services', newItems);
+                                    }}
+                                    className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+                                >
+                                    <Plus size={16} /> Add Service
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {data.services?.map((service, idx) => (
+                                    <div key={service.id} className="bg-slate-50 p-6 rounded-xl border relative group">
+                                        <button
+                                            onClick={() => {
+                                                const newItems = data.services.filter(s => s.id !== service.id);
+                                                handleSave('services', newItems);
+                                            }}
+                                            className="absolute top-4 right-4 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+
+                                        <div className="space-y-3">
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-500 uppercase">Service Title</label>
+                                                <input
+                                                    className="w-full border p-2 rounded mt-1 bg-white"
+                                                    value={service.title}
+                                                    onChange={(e) => {
+                                                        const newItems = [...data.services];
+                                                        newItems[idx].title = e.target.value;
+                                                        setData({ ...data, services: newItems });
+                                                    }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-500 uppercase">Icon (Lucide Name)</label>
+                                                <input
+                                                    className="w-full border p-2 rounded mt-1 bg-white"
+                                                    value={service.icon}
+                                                    onChange={(e) => {
+                                                        const newItems = [...data.services];
+                                                        newItems[idx].icon = e.target.value;
+                                                        setData({ ...data, services: newItems });
+                                                    }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-slate-500 uppercase">Description</label>
+                                                <textarea
+                                                    className="w-full border p-2 rounded mt-1 bg-white h-24"
+                                                    value={service.description}
+                                                    onChange={(e) => {
+                                                        const newItems = [...data.services];
+                                                        newItems[idx].description = e.target.value;
+                                                        setData({ ...data, services: newItems });
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <button
+                                onClick={() => handleSave('services', data.services)}
+                                className="mt-6 bg-primary text-white px-6 py-2 rounded-lg flex items-center gap-2"
+                            >
+                                <Save size={18} /> Update Services
+                            </button>
                         </div>
                     )}
 
