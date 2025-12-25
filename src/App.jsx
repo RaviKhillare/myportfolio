@@ -9,7 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 function App() {
     return (
         <AuthProvider>
-            <Router>
+            <Router basename="/myportfolio">
                 <Routes>
                     <Route path="/" element={<Layout />}>
                         <Route index element={<Home />} />
